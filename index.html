@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <!-- Desktop-only (non-responsive) -->
   <meta name="viewport" content="width=1366, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <title>PK264 — Twibbon + LGM (Gabungan)</title>
+  <title>PK264 — Twibbon + LGM </title>
   <style>
     :root{ --border:#e5e7eb; --bg:#f6f8fb; --text:#1f2937; --muted:#6b7280; --accent:#1961AE; --ok:#16a34a; }
     html,body{height:100%}
@@ -16,7 +16,7 @@
     /* container utama fixed width (tanpa padding default) */
     .shell{width:1280px; margin:0 auto; padding:0}
 
-    /* header tetap seperti semula */
+    /* header */
     .bar{display:flex; gap:10px; align-items:center; justify-content:space-between;
       background:#fff; border:1px solid var(--border); border-radius:12px;
       box-shadow:0 10px 25px rgba(0,0,0,.06); padding:12px 14px; margin:16px 16px 12px}
@@ -32,17 +32,17 @@
     .section{display:none}
     .section.active{display:block}
 
-    /* Twibbon: full-bleed (tanpa bungkus/padding) */
+    /* Twibbon: full-bleed */
     #secTwibbon { margin:0; }
     #secTwibbon .frame { width:100%; height:860px; border:0; display:block; }
 
-    /* LGM: tetap dibungkus card + padding halaman */
+    /* LGM: card */
     .page-pad{padding:16px}
     .card{background:#fff; border:1px solid var(--border); border-radius:12px; overflow:hidden}
     .card header{display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-bottom:1px solid var(--border); background:#fff}
     .card header h2{margin:0; font-size:15px}
 
-    /* mask kunci LGM sebelum pilih nama */
+    /* mask kunci LGM */
     .mask{position:absolute; inset:0; display:grid; place-items:center;
       background:repeating-linear-gradient(45deg, rgba(0,0,0,.03), rgba(0,0,0,.03) 12px, rgba(0,0,0,.04) 12px, rgba(0,0,0,.04) 24px); z-index:2}
     .mask.hide{display:none; pointer-events:none}
@@ -50,27 +50,58 @@
 
     /* iframe LGM */
     #lgmFrame.frame{width:100%; height:820px; border:0; display:block}
+
+    /* ===== Modal About ===== */
+    .modal-backdrop{
+      position:fixed; inset:0; background:rgba(0,0,0,.45);
+      display:none; align-items:center; justify-content:center; padding:16px;
+      z-index:1000;
+    }
+    .modal-backdrop.show{ display:flex; }
+    .modal-card{
+      width:min(720px, 96vw);
+      background:#fff; border:1px solid var(--border); border-radius:14px;
+      box-shadow:0 20px 50px rgba(0,0,0,.25); overflow:hidden;
+      transform:translateY(10px); opacity:0; transition:.18s ease;
+    }
+    .modal-backdrop.show .modal-card{ transform:translateY(0); opacity:1; }
+    .modal-head{display:flex; align-items:center; justify-content:space-between; gap:8px;
+      padding:12px 14px; border-bottom:1px solid var(--border)}
+    .modal-head h3{margin:0; font-size:16px}
+    .modal-body{padding:12px 14px}
+    .modal-foot{padding:12px 14px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:8px}
+    .modal-close{font-weight:700; line-height:1; width:34px; height:34px}
+    .contact-item{display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px dashed #eef2f6}
+    .contact-item:last-child{border-bottom:none}
+    .contact-name{margin:0; font-weight:700}
+    .contact-icons{display:flex; gap:10px}
+    .contact-icons a{display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; border:1px solid var(--border); border-radius:8px; text-decoration:none; color:#111}
+    .contact-icons i{pointer-events:none}
+    /* optional: cegah scroll body saat modal buka */
+    body.modal-open{overflow:hidden;}
   </style>
 </head>
 <body>
   <div class="shell">
-    <!-- Header tetap -->
+    <!-- Header -->
     <div class="bar" id="statusBar">
       <h1>PK264 — Generator Twibbon + Editor LGM (gabungan)</h1>
       <div class="chips">
         <span class="chip" id="chipName">Nama: —</span>
         <span class="chip" id="chipDegree">Jenjang: —</span>
-        <button class="btn" id="btnGoTwibbon">Ke Twibbon</button>
-        <button class="btn primary" id="btnGoLGM" disabled>Ke LGM</button>
+        <!-- default: Twibbon aktif -->
+        <button class="btn primary" id="btnGoTwibbon">Ke Twibbon</button>
+        <button class="btn" id="btnGoLGM" disabled>Ke LGM</button>
+        <button class="btn" id="btnAbout" aria-haspopup="dialog" title="Tentang aplikasi">About</button>
       </div>
     </div>
 
-    <!-- TWIBBON: TANPA BUNGKUS (full apa adanya) -->
+    <!-- TWIBBON -->
     <section id="secTwibbon" class="section active">
       <iframe id="twibbonFrame" class="frame" src="./Twibbon_PK264.html" title="Twibbon"></iframe>
     </section>
 
-    <!-- LGM: ada padding halaman + card -->
+    <!-- LGM -->
     <section id="secLGM" class="section">
       <div class="page-pad">
         <div class="card">
@@ -82,6 +113,49 @@
         </div>
       </div>
     </section>
+  </div>
+
+  <!-- Modal About -->
+  <div id="aboutModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="aboutTitle" aria-hidden="true">
+    <div class="modal-card">
+      <header class="modal-head">
+        <h3 id="aboutTitle">Tentang Aplikasi</h3>
+        <button class="btn modal-close" id="btnAboutClose" aria-label="Tutup">×</button>
+      </header>
+      <div class="modal-body">
+        <!-- Hilal -->
+        <div class="contact-item">
+          <p class="contact-name">Developed by Hilal</p>
+          <div class="contact-icons">
+            <a href="https://api.whatsapp.com/send/?phone=6282144205100&text&type=phone_number&app_absent=0" target="_blank" title="WhatsApp Hilal">WA</a>
+            <a href="https://instagram.com/hilalsudarbi" target="_blank" title="Instagram Hilal">IG</a>
+            <a href="https://linkedin.com/in/hilal-sudarbi" target="_blank" title="LinkedIn Hilal">in</a>
+          </div>
+        </div>
+
+        <!-- Lidya -->
+        <div class="contact-item">
+          <p class="contact-name">Twibbon &amp; LGM design by Lidya</p>
+          <div class="contact-icons">
+            <a href="https://api.whatsapp.com/send/?phone=6281266436366&text&type=phone_number&app_absent=0" target="_blank" title="WhatsApp Lidya">WA</a>
+            <a href="https://linkedin.com/in/lidyapermatasari" target="_blank" title="LinkedIn Lidya">in</a>
+          </div>
+        </div>
+
+        <!-- Widi -->
+        <div class="contact-item">
+          <p class="contact-name">Hosting &amp; domain by Widi</p>
+          <div class="contact-icons">
+            <a href="https://api.whatsapp.com/send/?phone=6285741710084&text&type=phone_number&app_absent=0" target="_blank" title="WhatsApp Widi">WA</a>
+            <a href="https://instagram.com/widyantoro_45" target="_blank" title="Instagram Widi">IG</a>
+            <a href="https://linkedin.com/in/muhamadwidyantoro" target="_blank" title="LinkedIn Widi">in</a>
+          </div>
+        </div>
+      </div>
+      <footer class="modal-foot">
+        <button class="btn" id="btnAboutOK">OK</button>
+      </footer>
+    </div>
   </div>
 
   <script>
@@ -97,7 +171,13 @@
     const lgmFrame     = document.getElementById('lgmFrame');
     const lgmMask      = document.getElementById('lgmMask');
 
-    // normalisasi jenjang -> "magister" | "doktor"
+    // Modal About
+    const aboutModal   = document.getElementById('aboutModal');
+    const btnAbout     = document.getElementById('btnAbout');
+    const btnAboutClose= document.getElementById('btnAboutClose');
+    const btnAboutOK   = document.getElementById('btnAboutOK');
+
+    // normalisasi jenjang
     function normDegree(s){
       const t = String(s||"").toLowerCase();
       if (t.includes("doktor") || t.includes("s3")) return "doktor";
@@ -105,11 +185,16 @@
       return "";
     }
 
-    // router sederhana via hash (desktop)
+    // router sederhana
     function show(route){
       if(route !== 'lgm'){ route = 'twibbon'; }
       secTwibbon.classList.toggle('active', route==='twibbon');
       secLGM.classList.toggle('active', route==='lgm');
+
+      // update tombol warna
+      btnGoTwibbon.classList.toggle('primary', route==='twibbon');
+      btnGoLGM.classList.toggle('primary', route==='lgm');
+
       window.scrollTo({top:0, behavior:'smooth'});
       const target = (route==='twibbon'? twibbonFrame : lgmFrame);
       target?.contentWindow?.postMessage({type:'parent:focus'}, '*');
@@ -117,6 +202,7 @@
         history.replaceState(null, '', '#'+route);
       }
     }
+
     window.addEventListener('hashchange', ()=> show((location.hash||'#twibbon').slice(1)));
     btnGoTwibbon.onclick = ()=> show('twibbon');
     btnGoLGM.onclick     = ()=> show('lgm');
@@ -137,15 +223,39 @@
         lgmMask.classList.add('hide');
         btnGoLGM.disabled = false;
 
-        // kirim degree + level ke LGM
+        // kirim ke LGM
         lgmFrame?.contentWindow?.postMessage({
           type:'lgm:apply-degree',
           payload:{ degree, level, record }
         }, '*');
-
-        // jika ingin otomatis pindah ke LGM, buka komentar:
-        // show('lgm');
       }
+    });
+
+    // ===== Modal handlers =====
+    function openAbout(){
+      aboutModal.classList.add('show');
+      aboutModal.removeAttribute('aria-hidden');
+      document.body.classList.add('modal-open');
+      // fokuskan tombol OK biar accessible
+      setTimeout(()=> btnAboutOK?.focus(), 0);
+    }
+    function closeAbout(){
+      aboutModal.classList.remove('show');
+      aboutModal.setAttribute('aria-hidden','true');
+      document.body.classList.remove('modal-open');
+      btnAbout?.focus();
+    }
+
+    btnAbout?.addEventListener('click', openAbout);
+    btnAboutClose?.addEventListener('click', closeAbout);
+    btnAboutOK?.addEventListener('click', closeAbout);
+    // klik backdrop untuk tutup
+    aboutModal?.addEventListener('click', (e)=>{
+      if(e.target === aboutModal) closeAbout();
+    });
+    // ESC untuk tutup
+    window.addEventListener('keydown', (e)=>{
+      if(e.key === 'Escape' && aboutModal.classList.contains('show')) closeAbout();
     });
 
     // initial route
