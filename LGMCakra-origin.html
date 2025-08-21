@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Life Grand Map — Editor PK26</title>
+
+  <!-- Bootstrap & Font -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="LGMCakra-origin.css" />
+</head>
+<body>
+  <div class="container shell py-4">
+
+    <!-- NAVIGASI -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <ul id="pager" class="nav nav-pills gap-2 flex-wrap"></ul>
+      <div class="d-flex gap-2">
+        <button id="prev" class="btn btn-outline-primary">Prev</button>
+        <button id="next" class="btn btn-outline-primary">Next</button>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <!-- PANEL FORM -->
+      <div class="col-lg-4">
+        <div class="card sticky-top">
+          <div class="card-body">
+            <h5 class="mb-2">
+              Form Halaman <span id="labelPg">1</span>/<span id="totalPg">7</span>
+            </h5>
+
+            <!-- === Skills Builder (Page 1) === -->
+            <div id="skillsBuilder" class="mb-3">
+              <div class="d-flex align-items-center justify-content-between">
+                <label class="form-label mb-1">Skills Builder (Halaman 1)</label>
+                <small class="text-muted">Pilih model → centang skill (maks 8)</small>
+              </div>
+
+              <select id="modelSelect" class="form-select form-select-sm mb-2"></select>
+
+              <div id="skillOptions" class="d-flex flex-wrap gap-2"></div>
+
+              <div id="skillsForm" class="mt-3"></div>
+
+              <hr class="my-3">
+            </div>
+            <!-- === /Skills Builder === -->
+
+            <!-- Instruksi per halaman (diisi via JS) -->
+            <div id="pageInstruction" class="mini text-muted mb-2"></div>
+
+            <!-- Kontrol FLOW (muncul hanya untuk flow yang tidak lock) -->
+            <div id="flowControls" class="row g-2 mb-2 d-none">
+              <div class="col-6">
+                <label class="form-label mini">Kolom</label>
+                <input id="fc_cols" type="number" min="1" max="3" step="1" class="form-control" value="2" />
+              </div>
+              <div class="col-6">
+                <label class="form-label mini">Gap (%)</label>
+                <input id="fc_gap" type="number" step="0.1" class="form-control" value="2.5" />
+              </div>
+              <div class="col-6">
+                <label class="form-label mini">Left (%)</label>
+                <input id="fc_left" type="number" step="0.1" class="form-control" value="11" />
+              </div>
+              <div class="col-6">
+                <label class="form-label mini">Top (%)</label>
+                <input id="fc_top" type="number" step="0.1" class="form-control" value="34" />
+              </div>
+              <div class="col-6">
+                <label class="form-label mini">Width (%)</label>
+                <input id="fc_width" type="number" step="0.1" class="form-control" value="78" />
+              </div>
+              <div class="col-6">
+                <label class="form-label mini">Pad X (%)</label>
+                <input id="fc_padx" type="number" step="0.1" class="form-control" value="2" />
+              </div>
+              <div class="col-6">
+                <label class="form-label mini">Pad Y (%)</label>
+                <input id="fc_pady" type="number" step="0.1" class="form-control" value="2" />
+              </div>
+            </div>
+
+            <!-- Input dinamis per box -->
+            <div id="inputsArea"></div>
+
+            <!-- Actions -->
+            <div class="d-grid gap-2 mt-3">
+              <button id="save" class="btn btn-outline-secondary">Simpan (Local)</button>
+              <small class="text-muted">Simpan progres di browser untuk dilanjutkan nanti.</small>
+
+              <button id="export" class="btn btn-primary mt-1">Download Halaman Ini</button>
+              <small class="text-muted">Unduh halaman yang aktif ini sebagai satu gambar PNG.</small>
+
+              <button id="exportAll" class="btn btn-accent text-white mt-1">Download Semua</button>
+              <small class="text-muted">Unduh semua halaman sekaligus dalam satu file ZIP.</small>
+            </div>
+  
+          </div>
+        </div>
+      </div>
+
+      <!-- STAGE PREVIEW -->
+      <div class="col-lg-8">
+        <div id="stage" class="stage">
+          <img id="bgImg" class="bg" alt="Background halaman" />
+          <!-- Overlay dibuat via JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Export libs -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+
+  <!-- Script utama -->
+  <script src="LGMCakra-origin.js"></script>
+</body>
+</html>

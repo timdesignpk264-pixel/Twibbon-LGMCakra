@@ -1,0 +1,299 @@
+/* =========================================================
+   LGMCakra — Stylesheet (Final)
+   - Stage 1080×1350, flow/abs overlay, card box UI
+   - Copywriting buttons & mini text
+   - Skills Builder (kolom kanan) helpers
+   ========================================================= */
+
+/* ---------- THEME TOKENS ---------- */
+:root{
+  /* Brand & neutrals */
+  --primary:#1961AE;
+  --secondary:#E4E6EF;
+  --white:#fff;
+  --gray-100:#f8f9fa;
+  --gray-200:#e9ecef;
+  --gray-400:#ced4da;
+  --gray-600:#6c757d;
+  --gray-800:#343a40;
+
+  /* Panel/Card */
+  --panel-bg:#fff;
+  --panel-border:#e9ecef;
+  --shadow-soft:0 8px 24px rgba(0,0,0,.06);
+
+  /* Rounded */
+  --radius:16px;
+
+  /* Editor palette (sinkron dengan JS COLOR) */
+  --title-default:#2e6368;   /* deep teal */
+  --title-text:#daa520;      /* goldenrod */
+  --body-default:#f6e6c5;    /* beige */
+
+  /* Accent LGM */
+  --mulberry:#61313e;
+  --text-gold:#f7c64b;
+
+  /* Stage */
+  --stage-bg:#ffffff;
+}
+
+/* ---------- GLOBAL ---------- */
+html, body{
+  height:100%;
+}
+body{
+  background:#F3F6F9; /* halus */
+  font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+  color:#212529;
+}
+
+.mini{ font-size:.86rem; color:var(--gray-600); }
+
+/* Container shell spacing tweak */
+.shell{ max-width:1200px; }
+
+/* Sticky panel offset (nice under nav) */
+.sticky-top{ top:1rem; }
+
+/* Accent button (untuk Download Semua) */
+.btn-accent{
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.btn-accent:hover{
+  filter: brightness(.95);
+}
+
+/* ---------- NAV / PAGER ---------- */
+#pager .nav-link{
+  border:1px solid var(--panel-border);
+  color:#39424e;
+}
+#pager .nav-link.active{
+  background: var(--primary);
+  border-color: var(--primary);
+  color:#fff;
+}
+
+/* ---------- STAGE PREVIEW ---------- */
+.stage{
+  position:relative;
+  width:100%;
+  /* Rasio 1080x1350 = 0.8 */
+  aspect-ratio: 1080 / 1350;
+  background: var(--stage-bg);
+  border-radius: var(--radius);
+  overflow:hidden;
+  box-shadow: var(--shadow-soft);
+}
+.stage.exporting{
+  border-radius:0 !important;
+  overflow:visible !important; /* agar tidak terklip saat render */
+}
+
+/* Background image */
+.stage .bg{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  pointer-events:none;
+  user-select:none;
+}
+
+/* ---------- FLOW LAYOUT OVERLAY ---------- */
+.flow-wrap{
+  position:absolute;
+  left: var(--left-px, 0);
+  top:  var(--top-px, 0);
+  width:var(--w-px, 100%);
+  display:grid;
+  grid-template-columns: repeat(var(--cols, 2), 1fr);
+  gap: var(--gap-px, 16px);
+  padding: var(--padY-px, 0) var(--padX-px, 0);
+  box-sizing:border-box;
+}
+
+/* ---------- ABSOLUTE BOX OVERLAY ---------- */
+.overlay-abs{
+  position:absolute;
+  box-sizing:border-box;
+}
+
+/* ---------- GENERIC BOX (judul + body) ---------- */
+.box{
+  --title-bg: var(--title-default);
+  --title-color: var(--title-text);
+  --body-bg: var(--body-default);
+  --body-border: 1px solid rgba(0,0,0,.05);
+  --body-pad-x: 14px;
+  --body-pad-y: 12px;
+  --shadow: var(--shadow-soft);
+
+  display:flex;
+  flex-direction:column;
+  background: transparent;
+  box-shadow: var(--shadow);
+  overflow:hidden;
+}
+
+/* ---------- Tambahan aturan box-title ---------- */
+.box-title {
+  align-self: flex-start;         /* ⬅️ biar nggak melebar full */
+  display: inline-block;
+  margin-bottom: 0px;
+  padding: .6rem .8rem;
+  line-height: .8;
+  background-color: var(--title-bg);
+  color: var(--title-color);
+  border-radius: 0 12px 0 0;
+  font-family: 'Raleway', sans-serif;
+  font-weight: 700;
+  font-size: 17px;
+  white-space: nowrap;            /* tetap 1 baris */
+  max-width: 95%;                 /* batasi kalau terlalu panjang */
+  overflow: hidden;               /* potong jika kepanjangan */
+  text-overflow: ellipsis;        /* kasih "..." kalau kepotong */
+}
+
+/* Isi box */
+.box-body{
+  background: var(--body-bg);
+  border: var(--body-border);
+  padding: var(--body-pad-y) var(--body-pad-x);
+  font-size: 13px;     /* ⬅️ ukuran isi lebih besar */
+  line-height: 1.4;    /* ⬅️ biar lega */
+  color:#1f2937;
+  min-height: 54px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+
+  /* corner sesuai request */
+  border-radius: 0 15px 0 15px;
+}
+
+
+
+/* ---------- LEFT PANEL (FORM) ---------- */
+.card{
+  border:1px solid var(--panel-border);
+  border-radius: 14px;
+  background: var(--panel-bg);
+  box-shadow: var(--shadow-soft);
+}
+.card .card-body{
+  padding: 1rem 1rem 1.15rem;
+}
+
+/* Form label mini di kontrol FLOW */
+.form-label.mini{
+  font-size:.82rem;
+  color:var(--gray-600);
+  margin-bottom:.25rem;
+}
+
+/* ---------- SKILLS BUILDER (tambahan CSS agar konsisten) ---------- */
+#skillsBuilder .sb-card{
+  border:1px solid var(--panel-border);
+  border-radius:12px;
+  padding:.9rem;
+  background:#fff;
+  box-shadow: var(--shadow-soft);
+  margin-bottom:.8rem;
+}
+#skillsBuilder .sb-ctr .btn{
+  margin-right:.25rem;
+}
+#skillsBuilder .sb-wcount{
+  font-size:.85rem;
+  opacity:.9;
+}
+#skillsBuilder .sb-wcount.ok{ color:#198754; }   /* hijau */
+#skillsBuilder .sb-wcount.warn{ color:#fd7e14; } /* oranye */
+#skillsBuilder .sb-wcount.bad{ color:#dc3545; }  /* merah */
+
+/* Pills (kalau tidak di-inject oleh JS, siapkan fallback) */
+#skillsBuilder #skillOptions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.5rem;
+}
+#skillsBuilder #skillOptions .pill{
+  display:inline-block;
+  padding:.38rem .66rem;
+  border:1px solid var(--secondary);
+  border-radius:999px;
+  background:#fff;
+  cursor:pointer;
+  user-select:none;
+  font-size:.86rem;
+  line-height:1;
+  transition:background .15s ease,color .15s ease,border-color .15s ease,transform .06s ease;
+}
+#skillsBuilder #skillOptions .pill:hover{
+  border-color:rgba(0,0,0,.12);
+  transform:translateY(-1px);
+}
+#skillsBuilder #skillOptions .pill.active{
+  background:var(--primary);
+  color:#fff;
+  border-color:var(--primary);
+}
+
+/* Instruksi kecil di panel kiri */
+#pageInstruction{
+  padding:.25rem 0 .35rem;
+  border-top:1px dashed rgba(0,0,0,.06);
+  border-bottom:1px dashed rgba(0,0,0,.06);
+  margin-bottom:.6rem;
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 992px){
+  .sticky-top{ top:0.5rem; }
+}
+@media (max-width: 576px){
+  #skillsBuilder #skillOptions .pill{
+    font-size:.82rem;
+    padding:.34rem .58rem;
+  }
+}
+
+/* ---------- PRINT / EXPORT SAFETY ---------- */
+@media print{
+  body{ background:#fff; }
+  .stage{ box-shadow:none; border-radius:0; }
+  .sticky-top{ position:static !important; }
+}
+/* ===== Uniform spacing untuk SEMUA halaman ===== */
+:root{
+  --flow-gap: 14px; /* ubah 12–16px sesuai selera */
+}
+.flow-wrap{
+  gap: var(--flow-gap, var(--gap-px)); /* pakai global gap */
+}
+.flow-wrap .box{ margin:0; }  /* jangan ada margin liar dari anak */
+.box-body{ margin:0; }        /* hilangkan jeda ekstra antar box */
+
+/* ===== Rapatkan title ke body (tanpa jarak) ===== */
+.box-title{
+  margin-bottom: 0 !important;     /* pastikan nol */
+  align-self: flex-start;           /* biar tidak stretch full */
+}
+.box-body{
+  /* kalau masih terasa renggang, kecilkan sedikit padding atas */
+  padding-top: calc(var(--body-pad-y) - 2px);
+}
+
+/* ===== Font responsif (opsional, biar tidak terlalu besar) ===== */
+.box-title{
+  /* dari 10–14px dynamic; ganti angka tengah kalau perlu */
+  font-size: clamp(10px, 0.95vw, 14px);
+  line-height: 1; /* hindari clipping di label kecil */
+}
+.box-body{
+  font-size: clamp(12px, 1.05vw, 14px);
+  line-height: 1.4;
+}

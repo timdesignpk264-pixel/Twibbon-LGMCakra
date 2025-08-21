@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <!-- Desktop-only (non-responsive) -->
+  <meta name="viewport" content="width=1366, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>PK264 — Twibbon + LGM (Gabungan)</title>
+  <style>
+    :root{ --border:#e5e7eb; --bg:#f6f8fb; --text:#1f2937; --muted:#6b7280; --accent:#1961AE; --ok:#16a34a; }
+    html,body{height:100%}
+    body{
+      margin:0; background:var(--bg); color:var(--text);
+      font:14px/1.5 Inter,system-ui,Segoe UI,Roboto,Arial; min-width:1366px;
+    }
+
+    /* container utama fixed width (tanpa padding default) */
+    .shell{width:1280px; margin:0 auto; padding:0}
+
+    /* header tetap seperti semula */
+    .bar{display:flex; gap:10px; align-items:center; justify-content:space-between;
+      background:#fff; border:1px solid var(--border); border-radius:12px;
+      box-shadow:0 10px 25px rgba(0,0,0,.06); padding:12px 14px; margin:16px 16px 12px}
+    .bar h1{margin:0; font-size:16px}
+    .chips{display:flex; gap:8px; align-items:center}
+    .chip{border:1px solid var(--border); background:#fff; border-radius:999px; padding:6px 10px}
+    .chip.ok{border-color:rgba(22,163,74,.25); background:rgba(22,163,74,.06); color:#166534}
+    .btn{appearance:none; border:1px solid var(--border); background:#fff; border-radius:10px; padding:7px 10px; cursor:pointer}
+    .btn.primary{background:var(--accent); border-color:var(--accent); color:#fff}
+    .btn[disabled]{opacity:.5; cursor:not-allowed}
+
+    /* SECTION switching */
+    .section{display:none}
+    .section.active{display:block}
+
+    /* Twibbon: full-bleed (tanpa bungkus/padding) */
+    #secTwibbon { margin:0; }
+    #secTwibbon .frame { width:100%; height:860px; border:0; display:block; }
+
+    /* LGM: tetap dibungkus card + padding halaman */
+    .page-pad{padding:16px}
+    .card{background:#fff; border:1px solid var(--border); border-radius:12px; overflow:hidden}
+    .card header{display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-bottom:1px solid var(--border); background:#fff}
+    .card header h2{margin:0; font-size:15px}
+
+    /* mask kunci LGM sebelum pilih nama */
+    .mask{position:absolute; inset:0; display:grid; place-items:center;
+      background:repeating-linear-gradient(45deg, rgba(0,0,0,.03), rgba(0,0,0,.03) 12px, rgba(0,0,0,.04) 12px, rgba(0,0,0,.04) 24px); z-index:2}
+    .mask.hide{display:none; pointer-events:none}
+    .mask .msg{background:#fff; border:1px dashed var(--border); border-radius:10px; padding:14px 16px; color:var(--muted)}
+
+    /* iframe LGM */
+    #lgmFrame.frame{width:100%; height:820px; border:0; display:block}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <!-- Header tetap -->
+    <div class="bar" id="statusBar">
+      <h1>PK264 — Generator Twibbon + Editor LGM (gabungan)</h1>
+      <div class="chips">
+        <span class="chip" id="chipName">Nama: —</span>
+        <span class="chip" id="chipDegree">Jenjang: —</span>
+        <button class="btn" id="btnGoTwibbon">Ke Twibbon</button>
+        <button class="btn primary" id="btnGoLGM" disabled>Ke LGM</button>
+      </div>
+    </div>
+
+    <!-- TWIBBON: TANPA BUNGKUS (full apa adanya) -->
+    <section id="secTwibbon" class="section active">
+      <iframe id="twibbonFrame" class="frame" src="./Twibbon_PK264.html" title="Twibbon"></iframe>
+    </section>
+
+    <!-- LGM: ada padding halaman + card -->
+    <section id="secLGM" class="section">
+      <div class="page-pad">
+        <div class="card">
+          <header><h2>Langkah 2 — LGM</h2></header>
+          <div style="position:relative">
+            <div id="lgmMask" class="mask"><div class="msg">Pilih nama di Twibbon dulu, ya.</div></div>
+            <iframe id="lgmFrame" class="frame" src="./LGMCakra-origin.html" title="LGM"></iframe>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // ---- DOM
+    const chipName     = document.getElementById('chipName');
+    const chipDegree   = document.getElementById('chipDegree');
+    const btnGoTwibbon = document.getElementById('btnGoTwibbon');
+    const btnGoLGM     = document.getElementById('btnGoLGM');
+
+    const secTwibbon   = document.getElementById('secTwibbon');
+    const secLGM       = document.getElementById('secLGM');
+    const twibbonFrame = document.getElementById('twibbonFrame');
+    const lgmFrame     = document.getElementById('lgmFrame');
+    const lgmMask      = document.getElementById('lgmMask');
+
+    // normalisasi jenjang -> "magister" | "doktor"
+    function normDegree(s){
+      const t = String(s||"").toLowerCase();
+      if (t.includes("doktor") || t.includes("s3")) return "doktor";
+      if (t.includes("magister") || t.includes("s2")) return "magister";
+      return "";
+    }
+
+    // router sederhana via hash (desktop)
+    function show(route){
+      if(route !== 'lgm'){ route = 'twibbon'; }
+      secTwibbon.classList.toggle('active', route==='twibbon');
+      secLGM.classList.toggle('active', route==='lgm');
+      window.scrollTo({top:0, behavior:'smooth'});
+      const target = (route==='twibbon'? twibbonFrame : lgmFrame);
+      target?.contentWindow?.postMessage({type:'parent:focus'}, '*');
+      if(location.hash !== '#'+route){
+        history.replaceState(null, '', '#'+route);
+      }
+    }
+    window.addEventListener('hashchange', ()=> show((location.hash||'#twibbon').slice(1)));
+    btnGoTwibbon.onclick = ()=> show('twibbon');
+    btnGoLGM.onclick     = ()=> show('lgm');
+
+    // terima hasil pilihan dari Twibbon
+    window.addEventListener('message', (e)=>{
+      const msg = e.data || {};
+      if (msg.type === 'twibbon:selected') {
+        const {displayName, degree, record} = msg;
+        const level = normDegree(degree);
+
+        chipName.textContent   = `Nama: ${displayName||'—'}`;
+        chipDegree.textContent = `Jenjang: ${degree||'—'}`;
+        chipName.classList.add('ok');
+        chipDegree.classList.add('ok');
+
+        // buka LGM
+        lgmMask.classList.add('hide');
+        btnGoLGM.disabled = false;
+
+        // kirim degree + level ke LGM
+        lgmFrame?.contentWindow?.postMessage({
+          type:'lgm:apply-degree',
+          payload:{ degree, level, record }
+        }, '*');
+
+        // jika ingin otomatis pindah ke LGM, buka komentar:
+        // show('lgm');
+      }
+    });
+
+    // initial route
+    show((location.hash||'#twibbon').slice(1));
+  </script>
+</body>
+</html>
