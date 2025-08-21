@@ -1873,7 +1873,7 @@ window.DATA = [
   },
   {
     "Kelompok": "PK264-2-Bima",
-    "Full Name": "Ana T. Novena Damar Asri",
+    "Full Name": "Novena Damar Asri",
     "University": "University of Malaya",
     "Program of Study": "PhD from Institute of Biological Science",
     "First Name": "Ana",
@@ -18000,3 +18000,4 @@ window.DATA = [
     "Selesai Studi": ""
   }
 ];
+
