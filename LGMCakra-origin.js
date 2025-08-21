@@ -281,6 +281,70 @@ const PAGES = [
 /* ---------- Instruksi per halaman (copywriting) ---------- */
 const PAGE_INSTR = [];
 
+/* =========================================================
+   UTIL: Temukan box di PAGES, Rename, dan Delete (HAPUS TOTAL)
+   ========================================================= */
+
+/** Cari referensi box berdasarkan id */
+function findBoxRef(boxId){
+  for (let i = 0; i < PAGES.length; i++){
+    const pg = PAGES[i];
+    if (!Array.isArray(pg.boxes)) continue;
+    const boxIndex = pg.boxes.findIndex(b => b.id === boxId);
+    if (boxIndex !== -1){
+      return { pageIndex:i, page:pg, boxIndex, box:pg.boxes[boxIndex] };
+    }
+  }
+  return null;
+}
+
+/** Ganti Nama Term: ubah label box + sinkron judul kanan & label kiri */
+function renameTerm(boxId){
+  const ref = findBoxRef(boxId);
+  if (!ref){ alert('Term tidak ditemukan: ' + boxId); return; }
+
+  const current = ref.box.label || '';
+  const typed = prompt('Nama baru untuk term:', current);
+  if (typed === null) return; // cancel
+  const name = String(typed).trim();
+  if (!name){ alert('Nama tidak boleh kosong.'); return; }
+
+  // mutasi data
+  ref.box.label = name;
+
+  // judul di preview-kanan
+  const titleEl = document.getElementById('title_' + boxId)
+               || document.getElementById('out_' + boxId)?.previousElementSibling;
+  if (titleEl) titleEl.textContent = name;
+
+  // label di panel kiri
+  const lblLeft = document.querySelector(`label[for="in_${boxId}"]`);
+  if (lblLeft) lblLeft.textContent = name;
+}
+
+/** Hapus Term: buang box dari halaman sumbernya + re-render halaman itu */
+function deleteTerm(boxId){
+  const ref = findBoxRef(boxId);
+  if (!ref){ alert('Term tidak ditemukan: ' + boxId); return; }
+
+  const labelNow = ref.box.label || boxId;
+  const ok = confirm(
+    `Hapus term "${labelNow}" dari halaman ini?\n\n` +
+    `Semua konten, judul di preview, dan form kiri akan dihapus.`
+  );
+  if (!ok) return;
+
+  // 1) Hapus dari struktur data
+  ref.page.boxes.splice(ref.boxIndex, 1);
+
+  // 2) Rapikan DOM yang ada (opsional; kita re-render juga)
+  document.getElementById('out_' + boxId)?.closest('.box')?.remove();
+  document.getElementById('grp_' + boxId)?.remove();
+
+  // 3) Re-render halaman asal agar layout rapi kembali
+  renderPage(ref.pageIndex);
+}
+
 /* ---------- Pager ---------- */
 function buildPager(){
   pager.innerHTML = '';
@@ -352,7 +416,8 @@ function renderPage(i){
       if (st.height)                 el.style.height = (st.height*s)+'px';
 
       const title = document.createElement('div');
-      title.className='box-title';
+      title.className = 'box-title';
+      title.id = 'title_' + b.id;       // ← penting untuk sinkron rename
       title.textContent = b.label;
 
       const out = document.createElement('div');
@@ -366,8 +431,15 @@ function renderPage(i){
       // input kiri + toolbar + counter (ABS)
       const grp=document.createElement('div');
       grp.className='mb-3';
+      grp.id = 'grp_' + b.id;           // ← memudahkan remove saat deleteTerm
       grp.innerHTML = `
-        <label class="form-label">${b.label}</label>
+        <div class="d-flex justify-content-between align-items-center gap-2">
+          <label class="form-label mb-0" for="in_${b.id}">${b.label}</label>
+          <div class="btn-group btn-group-sm">
+            <button type="button" class="btn btn-outline-secondary rename-term" data-box="${b.id}">Ganti Nama</button>
+            <button type="button" class="btn btn-outline-danger del-term" data-box="${b.id}">Hapus Term</button>
+          </div>
+        </div>
         <div class="fmt-bar">
           <button type="button" class="btn btn-outline-secondary btn-sm fmt-para">¶ Paragraf</button>
           <button type="button" class="btn btn-outline-secondary btn-sm fmt-bullets">• Bullets</button>
@@ -407,6 +479,10 @@ function renderPage(i){
       grp.querySelector('.fmt-para')  .addEventListener('click', ()=> insertParagraph(ta));
       grp.querySelector('.fmt-bullets').addEventListener('click', ()=> insertBullets(ta));
       grp.querySelector('.fmt-num')   .addEventListener('click', ()=> insertNumbered(ta));
+
+      // rename & delete term
+      grp.querySelector('.rename-term')?.addEventListener('click', ()=> renameTerm(b.id));
+      grp.querySelector('.del-term')?.addEventListener('click', ()=> deleteTerm(b.id));
     });
 
   } else {
@@ -468,6 +544,7 @@ function renderPage(i){
 
       const title = document.createElement('div');
       title.className='box-title';
+      title.id = 'title_' + b.id;     // ← penting untuk sinkron rename
       title.textContent = b.label;
 
       const out = document.createElement('div');
@@ -481,8 +558,15 @@ function renderPage(i){
       // input kiri + toolbar + counter (FLOW)
       const grp=document.createElement('div');
       grp.className='mb-3';
+      grp.id = 'grp_' + b.id;         // ← memudahkan remove saat deleteTerm
       grp.innerHTML = `
-        <label class="form-label">${b.label}</label>
+        <div class="d-flex justify-content-between align-items-center gap-2">
+          <label class="form-label mb-0" for="in_${b.id}">${b.label}</label>
+          <div class="btn-group btn-group-sm">
+            <button type="button" class="btn btn-outline-secondary rename-term" data-box="${b.id}">Ganti Nama</button>
+            <button type="button" class="btn btn-outline-danger del-term" data-box="${b.id}">Hapus Term</button>
+          </div>
+        </div>
         <div class="fmt-bar">
           <button type="button" class="btn btn-outline-secondary btn-sm fmt-para">¶ Paragraf</button>
           <button type="button" class="btn btn-outline-secondary btn-sm fmt-bullets">• Bullets</button>
@@ -523,6 +607,10 @@ function renderPage(i){
       grp.querySelector('.fmt-para')  .addEventListener('click', ()=> insertParagraph(ta));
       grp.querySelector('.fmt-bullets').addEventListener('click', ()=> insertBullets(ta));
       grp.querySelector('.fmt-num')   .addEventListener('click', ()=> insertNumbered(ta));
+
+      // rename & delete term
+      grp.querySelector('.rename-term')?.addEventListener('click', ()=> renameTerm(b.id));
+      grp.querySelector('.del-term')?.addEventListener('click', ()=> deleteTerm(b.id));
     });
 
     stage.appendChild(wrap);
@@ -583,6 +671,7 @@ document.getElementById('save').onclick = ()=>{
         const curPg = PAGES[i], savPg = saved[i] || {};
         if (savPg.flow && curPg.flow) curPg.flow = {...curPg.flow, ...savPg.flow};
         if (Array.isArray(savPg.boxes) && Array.isArray(curPg.boxes)){
+          // gabungkan per index; jika struktur berbeda, minimal field yang cocok akan terisi
           curPg.boxes = curPg.boxes.map((b, idx)=> ({...b, ...(savPg.boxes[idx]||{})}));
         }
       }
@@ -691,9 +780,6 @@ window.addEventListener('DOMContentLoaded', ()=>{
   Object.assign(SKILL_LIBRARY, CUSTOM_MODELS);
 
   /* ---------- State ---------- */
-  // NOTE: picked disediakan oleh modul utama? kalau tidak ada, definisikan lokal:
-  // let picked = [];
-  // Namun di file kamu picked memang lokal ke Skills Builder. Kita definisikan di sini.
   let picked = []; // [{ title }]
   let skillsModel = Object.keys(SKILL_LIBRARY)[0]; // default model pertama
 
@@ -745,7 +831,7 @@ window.addEventListener('DOMContentLoaded', ()=>{
     document.head.appendChild(style);
   })();
 
-  /* ---------- UI: Panel Model Kustom (dibuat via JS, tidak perlu ubah HTML) ---------- */
+  /* ---------- UI: Panel Model Kustom ---------- */
   const customWrap = document.createElement('div');
   customWrap.id = 'sb-custom';
   customWrap.className = 'mt-2';
@@ -777,7 +863,6 @@ window.addEventListener('DOMContentLoaded', ()=>{
     if (!modelSelect) return;
     const names = Object.keys(SKILL_LIBRARY);
     modelSelect.innerHTML = names.map(m => `<option value="${m}">${m}</option>`).join('');
-    // jika selected hilang (mis. setelah tambah model), set ke yang ada
     if (!names.includes(skillsModel)) skillsModel = names[0];
     modelSelect.value = skillsModel;
   }
@@ -1104,7 +1189,7 @@ function applyRecordToPages(rec, degreeRaw){
 }
 
 /* ===== Terima data dari Twibbon (iframe) =====
-   Twibbon kirim: { type:'twibbon:selected', degree, record } :contentReference[oaicite:1]{index=1}
+   Twibbon kirim: { type:'twibbon:selected', degree, record }
 */
 window.addEventListener("message", (ev)=>{
   const msg = ev.data || {};
