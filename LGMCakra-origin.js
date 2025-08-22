@@ -369,6 +369,56 @@ function toggleSkillsBuilder(pageIndex){
   sb.classList.toggle('d-none', pageIndex !== 0); // tampil hanya index 0
 }
 
+
+/* ================= Formatting Helpers (pasang sebelum "Render") ================= */
+function escapeHtml(s){
+  return (s||'')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+// inline: **bold** dan *italic* (urutan penting: bold dulu)
+function formatInline(text){
+  return text
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>');
+}
+/* Plain text -> HTML aman:
+   - "• " → <ul><li>...</li></ul>
+   - "1) " → <ol><li>...</li></ol>
+   - lainnya → <p>...</p>
+*/
+function formatToHTML(text){
+  const lines = escapeHtml(text || '').split(/\r?\n/);
+  let html = '', mode = null; // 'ul' | 'ol' | null
+  const open  = tag => { html += `<${tag}>`; mode = tag; };
+  const close = ()  => { if (mode){ html += `</${mode}>`; mode=null; } };
+
+  for (const line of lines){
+    if (!line.trim()){ close(); html += '<br>'; continue; }
+
+    const mBullet = line.match(/^\s*•\s+(.*)$/);
+    if (mBullet){ if (mode!=='ul'){ close(); open('ul'); } html += `<li>${formatInline(mBullet[1])}</li>`; continue; }
+
+    const mNum = line.match(/^\s*(\d+)\)\s+(.*)$/);
+    if (mNum){ if (mode!=='ol'){ close(); open('ol'); } html += `<li>${formatInline(mNum[2])}</li>`; continue; }
+
+    close(); html += `<p>${formatInline(line)}</p>`;
+  }
+  close(); return html;
+}
+/* Bungkus selection di textarea dengan marker (**, *) */
+function wrapSelection(textarea, marker){
+  const start = textarea.selectionStart, end = textarea.selectionEnd;
+  if (start===end) return;
+  const val = textarea.value;
+  textarea.value = val.slice(0,start) + marker + val.slice(start,end) + marker + val.slice(end);
+  textarea.dispatchEvent(new Event('input')); // sinkron preview
+  textarea.focus();
+  textarea.setSelectionRange(start, end + marker.length*2);
+}
+
+
 /* ---------- Render ---------- */
 function renderPage(i){
   // i = real index di dalam PAGES
@@ -391,7 +441,7 @@ function renderPage(i){
   stage.querySelectorAll('.overlay-abs, .flow-wrap').forEach(n=>n.remove());
   inputs.innerHTML='';
 
-  if (PAGES[i].type==='abs'){
+    if (PAGES[i].type==='abs'){
     /* ---------- ABS ---------- */
     flowCtr.wrap.classList.add('d-none');
 
@@ -417,13 +467,14 @@ function renderPage(i){
 
       const title = document.createElement('div');
       title.className = 'box-title';
-      title.id = 'title_' + b.id;       // ← penting untuk sinkron rename
+      title.id = 'title_' + b.id;
       title.textContent = b.label;
 
       const out = document.createElement('div');
       out.className='box-body';
       out.id = `out_${b.id}`;
-      out.textContent = b.val || '';
+      // ⬇️ gunakan HTML terformat
+      out.innerHTML = formatToHTML(b.val || '');
 
       el.append(title, out);
       stage.appendChild(el);
@@ -431,7 +482,7 @@ function renderPage(i){
       // input kiri + toolbar + counter (ABS)
       const grp=document.createElement('div');
       grp.className='mb-3';
-      grp.id = 'grp_' + b.id;           // ← memudahkan remove saat deleteTerm
+      grp.id = 'grp_' + b.id;
       grp.innerHTML = `
         <div class="d-flex justify-content-between align-items-center gap-2">
           <label class="form-label mb-0" for="in_${b.id}">${b.label}</label>
@@ -444,6 +495,8 @@ function renderPage(i){
           <button type="button" class="btn btn-outline-secondary btn-sm fmt-para">¶ Paragraf</button>
           <button type="button" class="btn btn-outline-secondary btn-sm fmt-bullets">• Bullets</button>
           <button type="button" class="btn btn-outline-secondary btn-sm fmt-num">1. Numbered</button>
+          <button type="button" class="btn btn-outline-secondary btn-sm fmt-bold"><b>B</b></button>
+          <button type="button" class="btn btn-outline-secondary btn-sm fmt-italic"><i>I</i></button>
         </div>
         <textarea id="in_${b.id}" class="form-control" rows="6" placeholder="Tulis konten..."></textarea>
         <div id="cnt_${b.id}" class="mini counter"></div>
@@ -457,7 +510,7 @@ function renderPage(i){
       ta.value = b.val || '';
       autoSizeTA(ta);
 
-      // set counter awal
+      // counter awal
       {
         const w = countWords(ta.value), cNo = countCharsNoSpace(ta.value), cWS = countCharsWS(ta.value);
         cnt.textContent = renderCounterText(w,cNo,cWS,rule);
@@ -467,7 +520,7 @@ function renderPage(i){
       ta.addEventListener('input', e=>{
         b.val = e.target.value;
         const outEl = document.getElementById('out_'+b.id);
-        if(outEl) outEl.textContent = b.val;
+        if(outEl) outEl.innerHTML = formatToHTML(b.val); // ⬅️ HTML terformat
         autoSizeTA(e.target);
 
         const w = countWords(b.val), cNo = countCharsNoSpace(b.val), cWS = countCharsWS(b.val);
@@ -479,14 +532,17 @@ function renderPage(i){
       grp.querySelector('.fmt-para')  .addEventListener('click', ()=> insertParagraph(ta));
       grp.querySelector('.fmt-bullets').addEventListener('click', ()=> insertBullets(ta));
       grp.querySelector('.fmt-num')   .addEventListener('click', ()=> insertNumbered(ta));
+      grp.querySelector('.fmt-bold')  ?.addEventListener('click', ()=> wrapSelection(ta, '**'));
+      grp.querySelector('.fmt-italic')?.addEventListener('click', ()=> wrapSelection(ta, '*'));
 
       // rename & delete term
       grp.querySelector('.rename-term')?.addEventListener('click', ()=> renameTerm(b.id));
       grp.querySelector('.del-term')?.addEventListener('click', ()=> deleteTerm(b.id));
     });
 
-    } else {
-    /* ---------- FLOW ---------- */
+  } else {
+
+        /* ---------- FLOW ---------- */
     const f = PAGES[i].flow;
 
     // tampilkan flow controls kalau tidak lock
@@ -497,7 +553,7 @@ function renderPage(i){
     flowCtr.cols.value=f.cols; flowCtr.gap.value=f.gapPct; flowCtr.left.value=f.leftPct;
     flowCtr.top.value=f.topPct; flowCtr.width.value=f.widthPct; flowCtr.padx.value=f.padXPct; flowCtr.pady.value=f.padYPct;
 
-    // anchor first-box-xy akan menonaktifkan left/top (di sini kita manual semua, jadi tidak aktif)
+    // anchor first-box-xy akan menonaktifkan left/top (di sini manual)
     flowCtr.left.disabled = !!(f.anchor && f.anchor.mode==='first-box-xy');
     flowCtr.top.disabled  = !!(f.anchor && f.anchor.mode==='first-box-xy');
 
@@ -544,13 +600,14 @@ function renderPage(i){
 
       const title = document.createElement('div');
       title.className='box-title';
-      title.id = 'title_' + b.id;     // ← penting untuk sinkron rename
+      title.id = 'title_' + b.id;
       title.textContent = b.label;
 
       const out = document.createElement('div');
       out.className='box-body';
       out.id = `out_${b.id}`;
-      out.textContent = b.val || '';
+      // ⬇️ gunakan HTML terformat
+      out.innerHTML = formatToHTML(b.val || '');
 
       card.append(title, out);
       wrap.appendChild(card);
@@ -558,7 +615,7 @@ function renderPage(i){
       // input kiri + toolbar + counter (FLOW)
       const grp=document.createElement('div');
       grp.className='mb-3';
-      grp.id = 'grp_' + b.id;         // ← memudahkan remove saat deleteTerm
+      grp.id = 'grp_' + b.id;
       grp.innerHTML = `
         <div class="d-flex justify-content-between align-items-center gap-2">
           <label class="form-label mb-0" for="in_${b.id}">${b.label}</label>
@@ -571,6 +628,8 @@ function renderPage(i){
           <button type="button" class="btn btn-outline-secondary btn-sm fmt-para">¶ Paragraf</button>
           <button type="button" class="btn btn-outline-secondary btn-sm fmt-bullets">• Bullets</button>
           <button type="button" class="btn btn-outline-secondary btn-sm fmt-num">1. Numbered</button>
+          <button type="button" class="btn btn-outline-secondary btn-sm fmt-bold"><b>B</b></button>
+          <button type="button" class="btn btn-outline-secondary btn-sm fmt-italic"><i>I</i></button>
         </div>
         <textarea id="in_${b.id}" class="form-control" rows="6" placeholder="Tulis konten..."></textarea>
         <div id="cnt_${b.id}" class="mini counter"></div>
@@ -584,7 +643,7 @@ function renderPage(i){
       ta.value = b.val || '';
       autoSizeTA(ta);
 
-      // set counter awal
+      // counter awal
       {
         const w = countWords(ta.value), cNo = countCharsNoSpace(ta.value), cWS = countCharsWS(ta.value);
         cnt.textContent = renderCounterText(w,cNo,cWS,rule);
@@ -595,7 +654,7 @@ function renderPage(i){
       ta.addEventListener('input', e=>{
         b.val=e.target.value;
         const outEl=document.getElementById('out_'+b.id);
-        if(outEl) outEl.textContent=b.val;
+        if(outEl) outEl.innerHTML = formatToHTML(b.val); // ⬅️ HTML terformat
         autoSizeTA(e.target);
 
         const w = countWords(b.val), cNo = countCharsNoSpace(b.val), cWS = countCharsWS(b.val);
@@ -607,29 +666,30 @@ function renderPage(i){
       grp.querySelector('.fmt-para')  .addEventListener('click', ()=> insertParagraph(ta));
       grp.querySelector('.fmt-bullets').addEventListener('click', ()=> insertBullets(ta));
       grp.querySelector('.fmt-num')   .addEventListener('click', ()=> insertNumbered(ta));
+      grp.querySelector('.fmt-bold')  ?.addEventListener('click', ()=> wrapSelection(ta, '**'));
+      grp.querySelector('.fmt-italic')?.addEventListener('click', ()=> wrapSelection(ta, '*'));
 
       // rename & delete term
       grp.querySelector('.rename-term')?.addEventListener('click', ()=> renameTerm(b.id));
       grp.querySelector('.del-term')?.addEventListener('click', ()=> deleteTerm(b.id));
     });
 
-    // 🔽 Tambahan logika jumlah box
+    // --- Logika jumlah box: 1/2/3
     const n = (PAGES[i].boxes || []).length;
     wrap.classList.remove('is-1','is-3');
 
     if (n === 1) {
       wrap.classList.add('is-1');
-      wrap.style.setProperty('--cols', 1);          // 1 kolom penuh
+      wrap.style.setProperty('--cols', 1);      // 1 kolom penuh
     } else {
-      wrap.style.setProperty('--cols', f.cols);     // default (biasanya 2)
+      wrap.style.setProperty('--cols', f.cols); // default (biasanya 2)
     }
-
     if (n === 3) {
-      wrap.classList.add('is-3');                   // box ke-3 full width
+      wrap.classList.add('is-3');               // box ke-3 full width
     }
-    // 🔼 End tambahan
 
     stage.appendChild(wrap);
+
   }
 
   // highlight pager aktif
