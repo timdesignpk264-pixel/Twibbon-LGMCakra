@@ -290,33 +290,44 @@ body{
   padding-top: calc(var(--body-pad-y) - 2px);
 }
 
-/* ===== Font responsif (opsional, biar tidak terlalu besar) ===== */
+/* ===== Font responsif ===== */
 .box-title{
-  /* dari 10–14px dynamic; ganti angka tengah kalau perlu */
   font-size: clamp(10px, 0.95vw, 14px);
-  line-height: 1; /* hindari clipping di label kecil */
+  line-height: 1;
 }
 .box-body{
   font-size: clamp(12px, 1.05vw, 14px);
   line-height: 1.4;
 }
-#skillsBuilder h5{
-  font-weight: 700;
-  color: var(--primary);
-  margin-bottom: .5rem;
-}
-#skillsBuilder label.form-label.mini{
-  font-size: .85rem;
-  font-weight: 600;
-  color: var(--gray-600);
-}
+
 /* ===== Layout adaptif berdasarkan jumlah box ===== */
-/* 3 box: item ke-3 span penuh (kolom 1 sampai akhir) */
 .flow-wrap.is-3 > .box:nth-child(3){
-  grid-column: 1 / -1;
+  grid-column: 1 / -1;            /* 3 box: item ke-3 full width */
+}
+.flow-wrap.is-1{
+  grid-template-columns: repeat(1, 1fr); /* 1 box: full width */
 }
 
-/* 1 box: boleh pakai var(--cols)=1 dari JS; rule ini opsional sebagai guard */
-.flow-wrap.is-1{
-  grid-template-columns: repeat(1, 1fr);
+/* ===== Formatting list & paragraf rapi (spasi seragam) ===== */
+.box-body p{
+  margin: 0 0 .25rem 0;           /* sama dengan li */
+  text-align: justify;
+  text-align-last: left;
 }
+
+.box-body ul,
+.box-body ol{
+  margin: 0 0 .25rem 0;           /* block list ke teks berikutnya */
+  padding-left: 1.1em;            /* hanging indent */
+  list-style-position: outside;
+}
+
+.box-body li{
+  margin: 0 0 .25rem 0;           /* sama dengan paragraf */
+  text-align: justify;
+  text-align-last: left;
+}
+
+/* Hilangkan jarak ekstra di akhir konten */
+.box-body > :last-child{ margin-bottom: 0; }
+.box-body li:last-child{ margin-bottom: 0; }
