@@ -5455,10 +5455,10 @@ window.DATA = [
   },
   {
     "Kelompok": "PK264-6-Larasati",
-    "Full Name": "Dr. Waluyo Sugito",
+    "Full Name": "Waluyo Sugito",
     "University": "University of Indonesia",
     "Program of Study": "Doctor of Medical Science",
-    "First Name": "Dr.",
+    "First Name": "Waluyo",
     "Middle Name": "Waluyo",
     "Last Name": "Sugito",
     "Nickname": "Waluyo",
@@ -18000,6 +18000,7 @@ window.DATA = [
     "Selesai Studi": ""
   }
 ];
+
 
 
 
