@@ -600,7 +600,7 @@ window.DATA = [
     "Program of Study": "Doctor of Education",
     "First Name": "Deshinta",
     "Middle Name": "Puspa Ayu Dwi Argaswari,",
-    "Last Name": "M.Pd",
+    "Last Name": "Argaswari",
     "Nickname": "Deshinta",
     "E-mail": "deshintapuspa@yahoo.com",
     "Phone": "6,28564E+12",
@@ -4609,7 +4609,7 @@ window.DATA = [
   },
   {
     "Kelompok": "PK264-5-Drupadi",
-    "Full Name": "M. Ridwan Sutisna, M.Pd.",
+    "Full Name": "M. Ridwan Sutisna",
     "University": "Indonesian International Islamic University",
     "Program of Study": "Doctor of Education",
     "First Name": "Muhammad",
@@ -18000,5 +18000,6 @@ window.DATA = [
     "Selesai Studi": ""
   }
 ];
+
 
 
