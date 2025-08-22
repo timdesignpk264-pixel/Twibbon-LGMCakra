@@ -1729,12 +1729,12 @@ window.DATA = [
   },
   {
     "Kelompok": "PK264-2-Bima",
-    "Full Name": "Alfian Adie Chandra, ST., M.Eng",
+    "Full Name": "Alfian Adie Chandra",
     "University": "Sepuluh Nopember Institute of Technology",
     "Program of Study": "Doctor of Marine Engineering",
     "First Name": "Alfian",
-    "Middle Name": "Adie Chandra, ST.,",
-    "Last Name": "M.Eng",
+    "Middle Name": "Adie Chandra",
+    "Last Name": "Chandra",
     "Nickname": "Alfian",
     "E-mail": "alfiansipiluncen@gmail.com",
     "Phone": "6,28134E+12",
@@ -18000,6 +18000,7 @@ window.DATA = [
     "Selesai Studi": ""
   }
 ];
+
 
 
 
