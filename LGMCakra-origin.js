@@ -485,7 +485,7 @@ function renderPage(i){
       grp.querySelector('.del-term')?.addEventListener('click', ()=> deleteTerm(b.id));
     });
 
-  } else {
+    } else {
     /* ---------- FLOW ---------- */
     const f = PAGES[i].flow;
 
@@ -612,6 +612,22 @@ function renderPage(i){
       grp.querySelector('.rename-term')?.addEventListener('click', ()=> renameTerm(b.id));
       grp.querySelector('.del-term')?.addEventListener('click', ()=> deleteTerm(b.id));
     });
+
+    // 🔽 Tambahan logika jumlah box
+    const n = (PAGES[i].boxes || []).length;
+    wrap.classList.remove('is-1','is-3');
+
+    if (n === 1) {
+      wrap.classList.add('is-1');
+      wrap.style.setProperty('--cols', 1);          // 1 kolom penuh
+    } else {
+      wrap.style.setProperty('--cols', f.cols);     // default (biasanya 2)
+    }
+
+    if (n === 3) {
+      wrap.classList.add('is-3');                   // box ke-3 full width
+    }
+    // 🔼 End tambahan
 
     stage.appendChild(wrap);
   }
