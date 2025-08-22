@@ -2882,8 +2882,8 @@ window.DATA = [
   {
     "Kelompok": "PK264-3-Arjuna",
     "Full Name": "Aulia Herdiani",
-    "University": "Indonesian International Islamic University",
-    "Program of Study": "Phd in Economics",
+    "University": "University of Leeds",
+    "Program of Study": "PhD in Accounting and Finance",
     "First Name": "Aulia",
     "Middle Name": "",
     "Last Name": "Herdiani",
@@ -18000,4 +18000,5 @@ window.DATA = [
     "Selesai Studi": ""
   }
 ];
+
 
