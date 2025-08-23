@@ -318,7 +318,7 @@ body{
 .box-body ul,
 .box-body ol{
   margin: 0 0 .25rem 0;           /* block list ke teks berikutnya */
-  padding-left: 1.1em;            /* hanging indent */
+  padding-left: 2em;            /* hanging indent */
   list-style-position: outside;
 }
 
@@ -331,4 +331,5 @@ body{
 /* Hilangkan jarak ekstra di akhir konten */
 .box-body > :last-child{ margin-bottom: 0; }
 .box-body li:last-child{ margin-bottom: 0; }
+
 
