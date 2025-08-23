@@ -332,35 +332,21 @@ body{
 .box-body > :last-child{ margin-bottom: 0; }
 .box-body li:last-child{ margin-bottom: 0; }
 
-/* ===== Override bullet agar sejajar & rapat ===== */
-.box-body ul,
-.box-body ol {
-  list-style-position: inside;  /* bullet sejajar dengan teks */
-  padding-left: 0 !important;   /* HILANGKAN indent bawaan */
-  margin: 0 0 .25rem 0;
-}
-
-.box-body li {
-  margin: 0 0 .25rem 0;
-  text-indent: -0.25em;         /* rapatkan jarak bullet–teks */
-}
-
-/* ===== Bullet sejajar paragraf + jarak rapat & konsisten ===== */
-:root{ --bullet-gap: .35em; }  /* atur: .30–.45em sesuai selera */
+/* ===== FINAL: Bullet Word-style (hanging indent) ===== */
+:root { --bullet-indent: 1.2em; } /* sesuaikan 1.0–1.4em */
 
 .box-body ul,
 .box-body ol{
-  list-style-position: inside;   /* bullet lurus kiri seperti paragraf */
-  padding-left: 0 !important;    /* buang indent bawaan */
+  list-style-position: outside;        /* bullet di luar */
   margin: 0 0 .25rem 0;
+  padding-left: var(--bullet-indent);  /* ruang untuk bullet + teks menjorok */
 }
 
 .box-body li{
   margin: 0 0 .25rem 0;
-  /* kontrol jarak antara ● dan teks */
-  padding-left: var(--bullet-gap);                 /* agar baris ke-2 dst tetap sejajar */
-  text-indent: calc(-1 * var(--bullet-gap));      /* rapatkan baris pertama ke bullet */
+  text-indent: 0;                      /* baris 1 sejajar baris 2+ */
 }
 
-.box-body li::marker{ font-size: 1em; } /* (opsional) samakan ukuran marker */
+.box-body li::marker{ font-size: 1em; } /* opsional */
+
 
