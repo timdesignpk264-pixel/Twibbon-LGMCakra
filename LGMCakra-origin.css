@@ -331,3 +331,18 @@ body{
 /* Hilangkan jarak ekstra di akhir konten */
 .box-body > :last-child{ margin-bottom: 0; }
 .box-body li:last-child{ margin-bottom: 0; }
+
+/* ===== Override bullet agar sejajar & rapat ===== */
+.box-body ul,
+.box-body ol {
+  list-style-position: inside;  /* bullet sejajar dengan teks */
+  padding-left: 0 !important;   /* HILANGKAN indent bawaan */
+  margin: 0 0 .25rem 0;
+}
+
+.box-body li {
+  margin: 0 0 .25rem 0;
+  text-indent: -0.25em;         /* rapatkan jarak bullet–teks */
+}
+
+
