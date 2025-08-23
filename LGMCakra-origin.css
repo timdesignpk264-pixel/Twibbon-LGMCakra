@@ -345,4 +345,22 @@ body{
   text-indent: -0.25em;         /* rapatkan jarak bullet–teks */
 }
 
+/* ===== Bullet sejajar paragraf + jarak rapat & konsisten ===== */
+:root{ --bullet-gap: .35em; }  /* atur: .30–.45em sesuai selera */
+
+.box-body ul,
+.box-body ol{
+  list-style-position: inside;   /* bullet lurus kiri seperti paragraf */
+  padding-left: 0 !important;    /* buang indent bawaan */
+  margin: 0 0 .25rem 0;
+}
+
+.box-body li{
+  margin: 0 0 .25rem 0;
+  /* kontrol jarak antara ● dan teks */
+  padding-left: var(--bullet-gap);                 /* agar baris ke-2 dst tetap sejajar */
+  text-indent: calc(-1 * var(--bullet-gap));      /* rapatkan baris pertama ke bullet */
+}
+
+.box-body li::marker{ font-size: 1em; } /* (opsional) samakan ukuran marker */
 
