@@ -332,21 +332,3 @@ body{
 .box-body > :last-child{ margin-bottom: 0; }
 .box-body li:last-child{ margin-bottom: 0; }
 
-/* ===== FINAL: Bullet Word-style (hanging indent) ===== */
-:root { --bullet-indent: 1.2em; } /* sesuaikan 1.0–1.4em */
-
-.box-body ul,
-.box-body ol{
-  list-style-position: outside;        /* bullet di luar */
-  margin: 0 0 .25rem 0;
-  padding-left: var(--bullet-indent);  /* ruang untuk bullet + teks menjorok */
-}
-
-.box-body li{
-  margin: 0 0 .25rem 0;
-  text-indent: 0;                      /* baris 1 sejajar baris 2+ */
-}
-
-.box-body li::marker{ font-size: 1em; } /* opsional */
-
-
